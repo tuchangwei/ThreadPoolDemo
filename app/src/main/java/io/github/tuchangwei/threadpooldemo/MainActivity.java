@@ -1,7 +1,7 @@
 package io.github.tuchangwei.threadpooldemo;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -9,6 +9,7 @@ import android.view.View;
 
 public class MainActivity extends ActionBarActivity {
 
+    private ThreadPoolTest test;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +40,11 @@ public class MainActivity extends ActionBarActivity {
 
     public void testThreadPool(View view) {
 
-        new ThreadPoolTest();
+       test = new ThreadPoolTest();
+    }
+
+    public void cancelTask(View view) {
+
+        test.cancelTasks();
     }
 }

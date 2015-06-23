@@ -20,10 +20,10 @@ public class ThreadPoolTest {
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
 
     // Sets the initial threadpool size to 8
-    private static final int CORE_POOL_SIZE = 8;
+    private static final int CORE_POOL_SIZE = 1;
 
     // Sets the maximum threadpool size to 8
-    private static final int MAXIMUM_POOL_SIZE = 8;
+    private static final int MAXIMUM_POOL_SIZE = 1;
 
     public ThreadPoolTest() {
 
@@ -35,19 +35,39 @@ public class ThreadPoolTest {
                 queue);
 
         for (int i = 0; i < 20; i++) {
-            System.out.println("当前线程池大小[" + threadPoolExecutor.getPoolSize() + "],当前队列大小[" + queue.size() + "]");
-
             threadPoolExecutor.execute(new MyRunable("Thread"+i));
         }
+
+        System.out.println("当前线程池大小[" + threadPoolExecutor.getPoolSize() + "],当前队列大小[" + queue.size() + "]");
         // 关闭线程池
-        threadPoolExecutor.shutdown();
+        //threadPoolExecutor.shutdown();
     }
 
+
+    public void  cancelTasks() {
+
+        MyRunable[] tasks = new MyRunable[queue.size()];
+        queue.toArray(tasks);
+        synchronized (this) {
+
+            for (MyRunable task: tasks) {
+
+                if (null != task.currentThread) {
+
+                    System.out.println("取消当前正在执行的线程....");
+                    task.currentThread.interrupt();
+
+                }
+                threadPoolExecutor.remove(task);
+            }
+        }
+    }
     public class MyRunable implements Runnable {
 
         private String name;
-
+        public Thread currentThread;
         public MyRunable(String name) {
+
             this.name = name;
         }
 
@@ -56,10 +76,13 @@ public class ThreadPoolTest {
 
             try {
 
-                Thread.sleep(1000);
+                currentThread = Thread.currentThread();
+                System.out.println("当前队列大小[" + queue.size() + "]");
+                Thread.sleep(2000);
                 System.out.println(name + " finished job!") ;
 
             } catch (InterruptedException e) {
+
                 e.printStackTrace();
             }
         }
